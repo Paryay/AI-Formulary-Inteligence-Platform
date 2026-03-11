@@ -220,23 +220,8 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 ---
 
-## 👤 Author
 
-**[Your Name]**
 
-- LinkedIn: [Your Profile](#)
-- GitHub: [@your-username](https://github.com/your-username)
-- Portfolio: [your-site.com](#)
-
----
-
-## ⭐ Support
-
-If you find this project helpful:
-- Star the repository
-- Share it with colleagues
-- Connect on LinkedIn
-
----
+**
 
 **Built to solve real healthcare data challenges. Questions? Open an issue!**
