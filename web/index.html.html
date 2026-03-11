@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Formulary Intelligence Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        function AIFormularyPlatform() {
+            const [file, setFile] = useState(null);
+            const [carrier, setCarrier] = useState('');
+            const [analyzing, setAnalyzing] = useState(false);
+            const [results, setResults] = useState(null);
+            const [chatMessages, setChatMessages] = useState([]);
+            const [chatInput, setChatInput] = useState('');
+
+            const analyzeFile = async () => {
+                if (!file || !carrier) {
+                    alert('Please select a file and enter carrier name');
+                    return;
+                }
+
+                setAnalyzing(true);
+
+                // Simulate file processing and AI analysis
+                setTimeout(() => {
+                    const mockResults = {
+                        summary: {
+                            added: 247,
+                            deleted: 89,
+                            modified: 412,
+                            total: 50000
+                        },
+                        aiInsights: {
+                            summary: "Significant formulary restructuring focused on cost containment through generic alternatives and prior authorization requirements.",
+                            patterns: [
+                                "60% of new drugs are generics replacing brand alternatives",
+                                "Tier changes primarily affecting specialty medications (Tier 3→4)",
+                                "Prior authorization requirements added to 15% of existing drugs",
+                                "Average copay increase of 12% across modified drugs"
+                            ],
+                            anomalies: [
+                                {
+                                    type: "critical",
+                                    description: "3 diabetes medications deleted without clear alternatives",
+                                    drugs: ["Metformin XR 1000mg", "Januvia 100mg", "Victoza 1.8mg"]
+                                },
+                                {
+                                    type: "warning",
+                                    description: "Copay increase >50% on cardiovascular drugs",
+                                    impact: "~5,000 members affected, estimated cost shift $1.2M"
+                                },
+                                {
+                                    type: "warning",
+                                    description: "New prior auth on 23 previously unrestricted drugs",
+                                    impact: "May cause therapy delays for ~2,000 members"
+                                }
+                            ],
+                            impact: {
+                                financial: "$2.8M annual cost shift to members",
+                                clinical: "~15% of members may require medication changes",
+                                operational: "Estimated 500+ prior auth requests/month increase"
+                            },
+                            recommendations: [
+                                "Immediate: Review deleted diabetes medications - identify therapeutic alternatives",
+                                "Urgent: Prepare member communication plan for copay increases",
+                                "Required: Train pharmacy staff on new prior authorization workflows",
+                                "Suggested: Set up monitoring dashboard for member complaints",
+                                "Strategic: Negotiate with carrier on diabetes medication coverage"
+                            ]
+                        }
+                    };
+
+                    setResults(mockResults);
+                    setAnalyzing(false);
+                }, 2000);
+            };
+
+            const askClaude = async () => {
+                if (!chatInput.trim() || !results) return;
+
+                const userMessage = { role: 'user', content: chatInput };
+                setChatMessages([...chatMessages, userMessage]);
+                setChatInput('');
+
+                // Simulate AI response
+                setTimeout(() => {
+                    const aiResponse = {
+                        role: 'assistant',
+                        content: generateAIResponse(chatInput, results)
+                    };
+                    setChatMessages(prev => [...prev, aiResponse]);
+                }, 1000);
+            };
+
+            const generateAIResponse = (question, data) => {
+                const q = question.toLowerCase();
+                
+                if (q.includes('diabetes')) {
+                    return `Based on the analysis, I found 3 diabetes medications were deleted: Metformin XR 1000mg, Januvia 100mg, and Victoza 1.8mg. This is concerning because these are commonly prescribed medications. I recommend: 1) Contacting the carrier immediately to understand the rationale, 2) Identifying therapeutic alternatives, and 3) Preparing a transition plan for affected members.`;
+                } else if (q.includes('cost') || q.includes('impact')) {
+                    return `The financial impact is significant: approximately $${data.aiInsights.impact.financial} in annual cost shift to members. This affects roughly ${data.aiInsights.impact.clinical} who may need to change medications. The operational burden includes an estimated ${data.aiInsights.impact.operational}.`;
+                } else if (q.includes('priority') || q.includes('urgent')) {
+                    return `Top 3 priorities: 1) IMMEDIATE - Address the deleted diabetes medications (affects patient safety), 2) URGENT - Prepare member communications for copay changes (affects satisfaction), 3) REQUIRED - Train staff on new prior auth process (affects operations). The diabetes medication issue should be escalated to clinical leadership today.`;
+                } else {
+                    return `I've analyzed your formulary changes and found ${data.summary.added} additions, ${data.summary.deleted} deletions, and ${data.summary.modified} modifications. The main pattern is a shift toward generic alternatives with increased prior authorization requirements. Would you like me to dive deeper into any specific area?`;
+                }
+            };
+
+            return (
+                <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+                    {/* Header */}
+                    <div className="bg-white shadow-lg">
+                        <div className="max-w-7xl mx-auto px-4 py-6">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+                                        🤖 AI Formulary Intelligence Platform
+                                    </h1>
+                                    <p className="text-gray-600 mt-1">Powered by Claude AI · Intelligent Analysis & Insights</p>
+                                </div>
+                                <div className="text-sm text-gray-500">
+                                    <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full">
+                                        ● Claude Online
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="max-w-7xl mx-auto px-4 py-8">
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                            {/* Left Panel - Upload & Analysis */}
+                            <div className="lg:col-span-1 space-y-6">
+                                {/* Upload Card */}
+                                <div className="bg-white rounded-xl shadow-lg p-6">
+                                    <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+                                        📂 Upload Formulary
+                                    </h2>
+                                    
+                                    <div className="space-y-4">
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                Carrier Name
+                                            </label>
+                                            <input
+                                                type="text"
+                                                value={carrier}
+                                                onChange={(e) => setCarrier(e.target.value)}
+                                                placeholder="e.g., UnitedHealthcare"
+                                                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                                Formulary File
+                                            </label>
+                                            <input
+                                                type="file"
+                                                onChange={(e) => setFile(e.target.files[0])}
+                                                accept=".csv,.xlsx,.xls,.txt"
+                                                className="w-full px-4 py-2 border border-gray-300 rounded-lg file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                                            />
+                                            <p className="text-xs text-gray-500 mt-1">
+                                                Supports: CSV, Excel, Pipe-delimited
+                                            </p>
+                                        </div>
+
+                                        <button
+                                            onClick={analyzeFile}
+                                            disabled={analyzing || !file || !carrier}
+                                            className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex items-center justify-center gap-2"
+                                        >
+                                            {analyzing ? (
+                                                <>
+                                                    <span className="animate-spin">⚙️</span>
+                                                    AI Analyzing...
+                                                </>
+                                            ) : (
+                                                <>
+                                                    🤖 Analyze with AI
+                                                </>
+                                            )}
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Quick Stats */}
+                                {results && (
+                                    <div className="bg-white rounded-xl shadow-lg p-6">
+                                        <h3 className="text-lg font-semibold mb-4">Quick Stats</h3>
+                                        <div className="space-y-3">
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-gray-600">✨ Added</span>
+                                                <span className="font-bold text-green-600">{results.summary.added}</span>
+                                            </div>
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-gray-600">❌ Deleted</span>
+                                                <span className="font-bold text-red-600">{results.summary.deleted}</span>
+                                            </div>
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-gray-600">✏️ Modified</span>
+                                                <span className="font-bold text-blue-600">{results.summary.modified}</span>
+                                            </div>
+                                            <div className="pt-3 border-t">
+                                                <div className="flex justify-between items-center">
+                                                    <span className="text-gray-600 font-semibold">Total Records</span>
+                                                    <span className="font-bold">{results.summary.total.toLocaleString()}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Right Panel - AI Insights & Chat */}
+                            <div className="lg:col-span-2 space-y-6">
+                                {results ? (
+                                    <>
+                                        {/* AI Insights */}
+                                        <div className="bg-white rounded-xl shadow-lg p-6">
+                                            <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
+                                                🧠 AI-Generated Insights
+                                            </h2>
+                                            
+                                            {/* Summary */}
+                                            <div className="mb-6">
+                                                <h3 className="font-semibold text-lg mb-2">Executive Summary</h3>
+                                                <p className="text-gray-700 bg-blue-50 p-4 rounded-lg">
+                                                    {results.aiInsights.summary}
+                                                </p>
+                                            </div>
+
+                                            {/* Patterns */}
+                                            <div className="mb-6">
+                                                <h3 className="font-semibold text-lg mb-2">📊 Patterns Detected</h3>
+                                                <ul className="space-y-2">
+                                                    {results.aiInsights.patterns.map((pattern, idx) => (
+                                                        <li key={idx} className="flex items-start gap-2">
+                                                            <span className="text-blue-500 mt-1">▸</span>
+                                                            <span className="text-gray-700">{pattern}</span>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+
+                                            {/* Anomalies */}
+                                            <div className="mb-6">
+                                                <h3 className="font-semibold text-lg mb-2">⚠️ Anomalies & Red Flags</h3>
+                                                <div className="space-y-3">
+                                                    {results.aiInsights.anomalies.map((anomaly, idx) => (
+                                                        <div
+                                                            key={idx}
+                                                            className={`p-4 rounded-lg border-l-4 ${
+                                                                anomaly.type === 'critical' ? 'bg-red-50 border-red-500' : 'bg-yellow-50 border-yellow-500'
+                                                            }`}
+                                                        >
+                                                            <p className="font-semibold text-gray-900">{anomaly.description}</p>
+                                                            {anomaly.drugs && (
+                                                                <p className="text-sm text-gray-600 mt-1">
+                                                                    Affected: {anomaly.drugs.join(', ')}
+                                                                </p>
+                                                            )}
+                                                            {anomaly.impact && (
+                                                                <p className="text-sm text-gray-600 mt-1">
+                                                                    Impact: {anomaly.impact}
+                                                                </p>
+                                                            )}
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
+
+                                            {/* Impact */}
+                                            <div className="mb-6">
+                                                <h3 className="font-semibold text-lg mb-2">💰 Business Impact</h3>
+                                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                                    <div className="bg-purple-50 p-4 rounded-lg">
+                                                        <p className="text-sm text-gray-600">Financial</p>
+                                                        <p className="font-bold text-purple-700">{results.aiInsights.impact.financial}</p>
+                                                    </div>
+                                                    <div className="bg-green-50 p-4 rounded-lg">
+                                                        <p className="text-sm text-gray-600">Clinical</p>
+                                                        <p className="font-bold text-green-700">{results.aiInsights.impact.clinical}</p>
+                                                    </div>
+                                                    <div className="bg-orange-50 p-4 rounded-lg">
+                                                        <p className="text-sm text-gray-600">Operational</p>
+                                                        <p className="font-bold text-orange-700">{results.aiInsights.impact.operational}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Recommendations */}
+                                            <div>
+                                                <h3 className="font-semibold text-lg mb-2">✅ AI Recommendations</h3>
+                                                <ul className="space-y-2">
+                                                    {results.aiInsights.recommendations.map((rec, idx) => (
+                                                        <li key={idx} className="flex items-start gap-2">
+                                                            <span className="text-green-500 mt-1">✓</span>
+                                                            <span className="text-gray-700">{rec}</span>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        </div>
+
+                                        {/* AI Chat Interface */}
+                                        <div className="bg-white rounded-xl shadow-lg p-6">
+                                            <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+                                                💬 Ask Claude AI
+                                            </h2>
+                                            
+                                            {/* Chat Messages */}
+                                            <div className="h-64 overflow-y-auto mb-4 space-y-3 bg-gray-50 p-4 rounded-lg">
+                                                {chatMessages.length === 0 ? (
+                                                    <div className="text-center text-gray-500 py-8">
+                                                        <p className="text-lg mb-2">👋 Ask me anything about your formulary changes!</p>
+                                                        <p className="text-sm">Try: "What's the priority action?" or "Tell me about diabetes medications"</p>
+                                                    </div>
+                                                ) : (
+                                                    chatMessages.map((msg, idx) => (
+                                                        <div
+                                                            key={idx}
+                                                            className={`p-3 rounded-lg ${
+                                                                msg.role === 'user'
+                                                                    ? 'bg-blue-100 ml-8'
+                                                                    : 'bg-white border border-gray-200 mr-8'
+                                                            }`}
+                                                        >
+                                                            <p className="text-sm font-semibold mb-1">
+                                                                {msg.role === 'user' ? 'You' : '🤖 Claude'}
+                                                            </p>
+                                                            <p className="text-gray-700">{msg.content}</p>
+                                                        </div>
+                                                    ))
+                                                )}
+                                            </div>
+
+                                            {/* Chat Input */}
+                                            <div className="flex gap-2">
+                                                <input
+                                                    type="text"
+                                                    value={chatInput}
+                                                    onChange={(e) => setChatInput(e.target.value)}
+                                                    onKeyPress={(e) => e.key === 'Enter' && askClaude()}
+                                                    placeholder="Ask Claude about your formulary..."
+                                                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                />
+                                                <button
+                                                    onClick={askClaude}
+                                                    className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                                                >
+                                                    Send
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </>
+                                ) : (
+                                    <div className="bg-white rounded-xl shadow-lg p-12 text-center">
+                                        <div className="text-6xl mb-4">🤖</div>
+                                        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                                            AI-Powered Formulary Analysis
+                                        </h2>
+                                        <p className="text-gray-600 mb-6">
+                                            Upload a formulary file to get started with intelligent AI analysis
+                                        </p>
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-left">
+                                            <div className="p-4 bg-blue-50 rounded-lg">
+                                                <h3 className="font-semibold mb-2">🔍 Deep Analysis</h3>
+                                                <p className="text-sm text-gray-600">AI detects patterns, anomalies, and trends</p>
+                                            </div>
+                                            <div className="p-4 bg-green-50 rounded-lg">
+                                                <h3 className="font-semibold mb-2">💡 Smart Insights</h3>
+                                                <p className="text-sm text-gray-600">Get actionable recommendations</p>
+                                            </div>
+                                            <div className="p-4 bg-purple-50 rounded-lg">
+                                                <h3 className="font-semibold mb-2">💬 Ask Anything</h3>
+                                                <p className="text-sm text-gray-600">Chat with AI about your data</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        ReactDOM.render(<AIFormularyPlatform />, document.getElementById('root'));
+    </script>
+</body>
+</html>
