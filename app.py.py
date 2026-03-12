@@ -36,7 +36,7 @@ with st.sidebar:
         entity_type = "drug"
         entity_type_plural = "drugs"
     else:  # Pharmacy Network
-        key_options = ["Pharmacy_ID", "NPI", "NCPDP"]
+        key_options = ["PHARMACY_NUMBER", "NPI", "NCPDP"]
         entity_type = "pharmacy"
         entity_type_plural = "pharmacies"
     
@@ -68,10 +68,10 @@ with col1:
     st.subheader(f"📂 Baseline {file_type_label} File(s)")
     baseline_files = st.file_uploader(
         f"Upload baseline file(s) - can upload multiple parts",
-        type=['txt', 'csv'],
+        type=['txt', 'csv', 'parquet', 'gz'],
         accept_multiple_files=True,
         key='baseline',
-        help="Upload one file or multiple parts (e.g., part1, part2, part3, part4)"
+        help="Supports: TXT, CSV, Parquet, CSV.GZ (compressed). Upload one file or multiple parts."
     )
     if baseline_files:
         if len(baseline_files) == 1:
@@ -85,10 +85,10 @@ with col2:
     st.subheader(f"📂 Comparison {file_type_label} File(s)")
     comparison_files = st.file_uploader(
         f"Upload comparison file(s) - can upload multiple parts",
-        type=['txt', 'csv'],
+        type=['txt', 'csv', 'parquet', 'gz'],
         accept_multiple_files=True,
         key='comparison',
-        help="Upload one file or multiple parts (e.g., part1, part2, part3, part4)"
+        help="Supports: TXT, CSV, Parquet, CSV.GZ (compressed). Upload one file or multiple parts."
     )
     if comparison_files:
         if len(comparison_files) == 1:
@@ -108,15 +108,28 @@ if baseline_files and comparison_files:
                 # Step 1: Merge baseline files if multiple
                 st.write(f"📖 Reading baseline file(s)...")
                 
+                def read_file_smart(file, separator):
+                    """Read file based on extension"""
+                    filename = file.name.lower()
+                    
+                    if filename.endswith('.parquet'):
+                        return pd.read_parquet(file)
+                    elif filename.endswith('.csv.gz') or filename.endswith('.gz'):
+                        return pd.read_csv(file, sep=separator, compression='gzip', low_memory=False, encoding='utf-8', on_bad_lines='skip')
+                    elif filename.endswith('.csv'):
+                        return pd.read_csv(file, sep=separator, low_memory=False, encoding='utf-8', on_bad_lines='skip')
+                    else:  # .txt
+                        return pd.read_csv(file, sep=separator, low_memory=False, encoding='utf-8', on_bad_lines='skip')
+                
                 if len(baseline_files) == 1:
-                    jan_df = pd.read_csv(baseline_files[0], sep=file_separator, low_memory=False, encoding='utf-8', on_bad_lines='skip')
+                    jan_df = read_file_smart(baseline_files[0], file_separator)
                     st.write(f"✅ Loaded 1 file: {len(jan_df):,} records")
                 else:
                     # Merge multiple parts
                     st.write(f"🔗 Merging {len(baseline_files)} baseline parts...")
                     dfs = []
                     for i, file in enumerate(sorted(baseline_files, key=lambda x: x.name), 1):
-                        df_part = pd.read_csv(file, sep=file_separator, low_memory=False, encoding='utf-8', on_bad_lines='skip')
+                        df_part = read_file_smart(file, file_separator)
                         dfs.append(df_part)
                         st.write(f"  Part {i}: {len(df_part):,} records")
                     
@@ -127,14 +140,14 @@ if baseline_files and comparison_files:
                 st.write(f"📖 Reading comparison file(s)...")
                 
                 if len(comparison_files) == 1:
-                    feb_df = pd.read_csv(comparison_files[0], sep=file_separator, low_memory=False, encoding='utf-8', on_bad_lines='skip')
+                    feb_df = read_file_smart(comparison_files[0], file_separator)
                     st.write(f"✅ Loaded 1 file: {len(feb_df):,} records")
                 else:
                     # Merge multiple parts
                     st.write(f"🔗 Merging {len(comparison_files)} comparison parts...")
                     dfs = []
                     for i, file in enumerate(sorted(comparison_files, key=lambda x: x.name), 1):
-                        df_part = pd.read_csv(file, sep=file_separator, low_memory=False, encoding='utf-8', on_bad_lines='skip')
+                        df_part = read_file_smart(file, file_separator)
                         dfs.append(df_part)
                         st.write(f"  Part {i}: {len(df_part):,} records")
                     
