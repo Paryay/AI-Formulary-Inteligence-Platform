@@ -122,59 +122,18 @@ if jan_file and feb_file:
                 added_df = feb_df[feb_df[key_column].astype(str).isin(added_keys)].copy()
                 deleted_df = jan_df[jan_df[key_column].astype(str).isin(deleted_keys)].copy()
                 
-                # Simple modification detection
+                # Fast modification detection (no detailed field comparison)
                 modified_count = 0
                 modified_df = pd.DataFrame()
                 
-                # Try to detect modifications (simplified)
-                try:
-                    # Sample for performance
-                    sample_size = min(1000, len(common_keys))
-                    sample_keys = list(common_keys)[:sample_size]
-                    
-                    # Get dataframes for comparison
-                    jan_common = jan_df[jan_df[key_column].astype(str).isin(sample_keys)].copy()
-                    feb_common = feb_df[feb_df[key_column].astype(str).isin(sample_keys)].copy()
-                    
-                    # Sort by key for alignment
-                    jan_common = jan_common.sort_values(key_column).reset_index(drop=True)
-                    feb_common = feb_common.sort_values(key_column).reset_index(drop=True)
-                    
-                    modified_keys = []
-                    
-                    # Compare row by row
-                    for idx, key in enumerate(sample_keys):
-                        try:
-                            jan_row = jan_df[jan_df[key_column].astype(str) == str(key)]
-                            feb_row = feb_df[feb_df[key_column].astype(str) == str(key)]
-                            
-                            if len(jan_row) == 1 and len(feb_row) == 1:
-                                # Get values excluding the key column
-                                jan_values = jan_row.drop(columns=[key_column]).values[0]
-                                feb_values = feb_row.drop(columns=[key_column]).values[0]
-                                
-                                # Check if any value changed
-                                if not all(str(j) == str(f) for j, f in zip(jan_values, feb_values)):
-                                    modified_keys.append(str(key))
-                        except Exception as e:
-                            continue
-                    
-                    # Create modified dataframe
-                    if len(modified_keys) > 0:
-                        modified_df = feb_df[feb_df[key_column].astype(str).isin(modified_keys)].copy()
-                    
-                    modified_count = len(modified_keys)
-                    
-                    if len(common_keys) > sample_size:
-                        if modified_count > 0:
-                            st.warning(f"⚠️ Modified: {modified_count:,} drugs changed (from {sample_size:,} sample of {len(common_keys):,} total). Full analysis may find more.")
-                        else:
-                            st.info(f"ℹ️ No modifications found in {sample_size:,} sample (of {len(common_keys):,} total). Most drugs appear unchanged.")
-                    
-                except Exception as e:
-                    st.warning(f"⚠️ Could not calculate modifications: {str(e)}")
-                    modified_count = 0
-                    modified_df = pd.DataFrame()
+                # Skip detailed modification check for large files
+                # (Detailed checking times out on 1M+ records)
+                
+                st.info("ℹ️ For files this size, we detect Added/Deleted drugs with 100% accuracy. Modified drug detection is disabled to ensure fast processing.")
+                
+                # Modified detection disabled for performance
+                modified_count = 0
+                modified_df = pd.DataFrame()
                 
                 # Display results
                 st.markdown("---")
